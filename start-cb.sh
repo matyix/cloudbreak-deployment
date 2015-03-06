@@ -177,6 +177,7 @@ start_consul() {
     docker run -d \
         -h node1 \
         --name=consul \
+        --privileged \
         -e SERVICE_IGNORE=true \
         -p ${BRIDGE_IP}:53:53/udp \
         -p ${BRIDGE_IP}:8400:8400 \
@@ -191,6 +192,7 @@ start_registrator() {
     debug $desc
     docker run -d \
       --name=registrator \
+      --privileged \
       -v /var/run/docker.sock:/tmp/docker.sock \
       gliderlabs/registrator:$DOCKER_TAG_REGISTRATOR consul://${BRIDGE_IP}:8500
 }
@@ -215,6 +217,7 @@ start_cloudbreak_db() {
     debug $desc
     docker run -d -P \
       --name=cbdb \
+      --privileged \
       -e "SERVICE_NAME=cbdb" \
       -e SERVICE_CHECK_CMD='psql -h 127.0.0.1 -p 5432  -U postgres -c "select 1"' \
       -v /var/lib/cloudbreak/cbdb:/var/lib/postgresql/data \
@@ -229,6 +232,7 @@ start_uaa() {
     debug $desc
     docker run -d -P \
       --name="uaadb" \
+      --privileged \
       -e "SERVICE_NAME=uaadb" \
       -e SERVICE_CHECK_CMD='psql -h 127.0.0.1 -p 5432  -U postgres -c "select 1"' \
       -v /var/lib/cloudbreak/uaadb:/var/lib/postgresql/data \
@@ -238,6 +242,7 @@ start_uaa() {
 
     docker run -d -P \
       --name="uaa" \
+      --privileged \
       -e "SERVICE_NAME=uaa" \
       -e SERVICE_CHECK_HTTP=/login \
       -e IDENTITY_DB_URL=$(dhp uaadb) \
@@ -280,6 +285,7 @@ start_cloudbreak() {
 
     docker run -d \
         --name=cloudbreak \
+        --privileged \
         -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
         -e AWS_SECRET_KEY=$AWS_SECRET_KEY \
         -e SERVICE_NAME=cloudbreak \
@@ -298,6 +304,7 @@ start_cloudbreak() {
 
 start_uluwatu() {
     docker run -d --name uluwatu \
+    --privileged \
     -e ULU_PRODUCTION=false \
     -e SERVICE_NAME=uluwatu \
     -e SERVICE_CHECK_HTTP=/ \
@@ -317,6 +324,7 @@ start_uluwatu() {
 
 start_sultans() {
     docker run -d --name sultans \
+    --privileged \
     -e SL_CLIENT_ID=$UAA_SULTANS_ID \
     -e SL_CLIENT_SECRET=$UAA_SULTANS_SECRET \
     -e SERVICE_NAME=sultans \
@@ -338,6 +346,7 @@ start_periscope_db() {
     debug $desc
     docker run -d -P \
       --name=periscopedb \
+      --privileged \
       -e "SERVICE_NAME=periscopedb" \
       -e SERVICE_CHECK_CMD='psql -h 127.0.0.1 -p 5432  -U postgres -c "select 1"' \
       -v /var/lib/periscope/periscopedb:/var/lib/postgresql/data \
